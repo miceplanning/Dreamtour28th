@@ -96,9 +96,9 @@ function renderLayout(activePage) {
     { key: "home", href: "index.html", icon: "🏠", label: "홈" },
     { key: "schedule", href: "schedule.html", icon: "🗓️", label: "일정" },
     { key: "location", href: "location.html", icon: "🗺️", label: "오시는길" },
-    { key: "faq", href: "faq.html", icon: "❓", label: "FAQ" },
-    { key: "survey", href: "survey.html", icon: "📝", label: "설문" }
-  ];
+    { key: "faq", href: "faq.html", icon: "❓", label: "FAQ", sectionKey: "faq" },
+    { key: "survey", href: "survey.html", icon: "📝", label: "설문", sectionKey: "survey" }
+  ].filter((t) => !t.sectionKey || (c.sectionsEnabled && c.sectionsEnabled[t.sectionKey]) !== false);
   nav.innerHTML = tabs
     .map(
       (t) =>

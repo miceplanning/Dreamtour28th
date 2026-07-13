@@ -98,6 +98,12 @@
       <!-- ③ 우천 시 안내 -->
       <section class="editor-panel" id="panel-rain" data-icon="☔" data-label="우천 시 안내">
         <div class="panel-head"><span class="panel-icon">☔</span><h2>우천 시 대응 안내</h2></div>
+        <div class="section-toggle">
+          <label class="checkbox-line">
+            <input type="checkbox" data-section-key="rainPlan" />
+            이 섹션 사용 (끄면 참가자 사이트에서 통째로 안 보여요 — 데이터는 남아있어요)
+          </label>
+        </div>
         <label class="checkbox-line">
           <input type="checkbox" id="f-rain-hasIndoor" />
           실내 대체 프로그램이 있음
@@ -124,6 +130,12 @@
       <!-- ⑤ 스태프 목록 -->
       <section class="editor-panel" id="panel-staff" data-icon="🙋" data-label="현장 스태프">
         <div class="panel-head"><span class="panel-icon">🙋</span><h2>현장 스태프</h2><span class="panel-count" id="count-staff"></span></div>
+        <div class="section-toggle">
+          <label class="checkbox-line">
+            <input type="checkbox" data-section-key="staff" />
+            이 섹션 사용 (끄면 참가자 사이트에서 통째로 안 보여요 — 데이터는 남아있어요)
+          </label>
+        </div>
         <div id="staff-list" class="repeat-list"></div>
         <button type="button" class="btn-add" id="add-staff">+ 스태프 추가</button>
       </section>
@@ -131,6 +143,12 @@
       <!-- ⑥ 집결 정보 -->
       <section class="editor-panel" id="panel-meeting" data-icon="📍" data-label="집결 정보">
         <div class="panel-head"><span class="panel-icon">📍</span><h2>집결 정보 (홈 화면 요약용)</h2></div>
+        <div class="section-toggle">
+          <label class="checkbox-line">
+            <input type="checkbox" data-section-key="meetingSummary" />
+            이 섹션 사용 (끄면 참가자 사이트에서 통째로 안 보여요 — 데이터는 남아있어요)
+          </label>
+        </div>
         <div class="field-grid">
           <label>집결 시각 <input type="text" id="f-meet-time" placeholder="13:00" /></label>
           <label>집결 장소 <input type="text" id="f-meet-location" /></label>
@@ -161,6 +179,12 @@
       <!-- ⑨ 체크리스트 -->
       <section class="editor-panel" id="panel-checklist" data-icon="🎒" data-label="준비물 체크리스트">
         <div class="panel-head"><span class="panel-icon">🎒</span><h2>준비물 체크리스트</h2><span class="panel-count" id="count-checklist"></span></div>
+        <div class="section-toggle">
+          <label class="checkbox-line">
+            <input type="checkbox" data-section-key="checklist" />
+            이 섹션 사용 (끄면 참가자 사이트에서 통째로 안 보여요 — 데이터는 남아있어요)
+          </label>
+        </div>
         <div id="checklist-list" class="repeat-list"></div>
         <button type="button" class="btn-add" id="add-checklist">+ 준비물 추가</button>
       </section>
@@ -168,6 +192,12 @@
       <!-- ⑩ FAQ -->
       <section class="editor-panel" id="panel-faq" data-icon="❓" data-label="FAQ">
         <div class="panel-head"><span class="panel-icon">❓</span><h2>자주 묻는 질문</h2><span class="panel-count" id="count-faq"></span></div>
+        <div class="section-toggle">
+          <label class="checkbox-line">
+            <input type="checkbox" data-section-key="faq" />
+            이 섹션 사용 (끄면 하단 메뉴에서 FAQ 탭도 함께 사라져요 — 데이터는 남아있어요)
+          </label>
+        </div>
         <div id="faq-list" class="repeat-list"></div>
         <button type="button" class="btn-add" id="add-faq">+ 질문 추가</button>
       </section>
@@ -175,6 +205,12 @@
       <!-- ⑪ 설문조사 -->
       <section class="editor-panel" id="panel-survey" data-icon="📝" data-label="설문조사">
         <div class="panel-head"><span class="panel-icon">📝</span><h2>설문조사</h2></div>
+        <div class="section-toggle">
+          <label class="checkbox-line">
+            <input type="checkbox" data-section-key="survey" />
+            이 섹션 사용 (끄면 하단 메뉴에서 설문 탭도 함께 사라져요 — 데이터는 남아있어요)
+          </label>
+        </div>
         <div class="field-grid">
           <label class="span-2">설문 링크 <input type="text" id="f-survey-url" placeholder="https://forms.gle/..." /></label>
           <label>예상 소요시간 <input type="text" id="f-survey-duration" placeholder="약 3분" /></label>
@@ -206,6 +242,12 @@
   <button type="button" class="floating-save" id="floating-save" title="content.js 파일 저장" aria-label="content.js 파일 저장">
     💾
   </button>
+
+  <!-- 참가자 사진 업로드 확인 기능용 (설정 전에는 자동으로 비활성 상태로 동작합니다) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/photo-upload.js"></script>
 
   <script src="js/content.js"></script>
   <script src="js/editor.js"></script>

@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const c = window.CONTENT;
   const root = document.getElementById("faq-content");
 
+  if (c.sectionsEnabled && c.sectionsEnabled.faq === false) {
+    root.innerHTML = '<p style="color:var(--color-muted);">이번 회차는 FAQ가 준비되어 있지 않습니다.</p>';
+    return;
+  }
+
   if (!c.faq || !c.faq.length) {
     root.innerHTML = '<p style="color:var(--color-muted);">등록된 FAQ가 없습니다.</p>';
     return;

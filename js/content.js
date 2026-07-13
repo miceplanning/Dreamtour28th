@@ -23,6 +23,20 @@ window.CONTENT = {
   heroTagline: "제주의 바다와 숲을 함께 걷는 하루",
 
   // ---------------------------------------------------------------
+  // 1-1. 섹션 사용 여부 (이번 회차에 필요 없는 섹션은 false로 꺼두면
+  //       참가자 사이트에서 통째로 안 보이게 됩니다. 데이터는 지워지지
+  //       않으니 다음 회차에 다시 true로 켜면 그대로 돌아옵니다)
+  // ---------------------------------------------------------------
+  sectionsEnabled: {
+    rainPlan: true,       // 우천 시 안내 (홈 화면)
+    staff: true,          // 현장 스태프 (홈 화면)
+    meetingSummary: true, // 집결 정보 (홈 화면)
+    checklist: true,      // 준비물 체크리스트 (홈 화면)
+    faq: true,            // FAQ (홈 화면 안내 + FAQ 페이지/하단 메뉴)
+    survey: true          // 설문조사 (홈 화면 안내 + 설문 페이지/하단 메뉴)
+  },
+
+  // ---------------------------------------------------------------
   // 2. 공지사항 배너 (화면 맨 위에 고정으로 뜹니다)
   // ---------------------------------------------------------------
   notice: {
@@ -78,6 +92,10 @@ window.CONTENT = {
   //   distance             : 총 도보 거리, 해당 없으면 null
   //   meal                 : 식사 관련 정보, 식사가 아니면 null
   //   freeTimeRecommendation : 자유시간 추천 동선 (우선순위 순 배열), 없으면 null
+  //   photo                : 이 일정과 관련된 사진 (images 폴더 경로), 없으면 null
+  //   photoUpload          : { enabled: true/false } - true면 참가자가 이 활동 사진을
+  //                           직접 올릴 수 있는 업로드 칸이 생깁니다 (최초 설정 필요,
+  //                           README의 "참가자 사진 업로드 기능 설정하기" 참고)
   // ---------------------------------------------------------------
   schedule: [
     {
@@ -92,7 +110,9 @@ window.CONTENT = {
       difficulty: null,
       distance: null,
       meal: null,
-      freeTimeRecommendation: null
+      freeTimeRecommendation: null,
+      photo: null,
+      photoUpload: { enabled: false } // true로 바꾸면 참가자가 이 활동 사진을 직접 업로드할 수 있는 칸이 생깁니다 (사진 업로드 기능 최초 설정 필요, README 참고)
     },
     {
       id: 2,
@@ -106,7 +126,9 @@ window.CONTENT = {
       difficulty: "보통",
       distance: "총 도보 2.3km",
       meal: null,
-      freeTimeRecommendation: null
+      freeTimeRecommendation: null,
+      photo: null,
+      photoUpload: { enabled: true } // 예시: 이 활동은 참가자가 사진을 직접 올릴 수 있도록 켜둔 상태입니다
     },
     {
       id: 3,
@@ -124,7 +146,9 @@ window.CONTENT = {
         "1순위: 해녀 전시관 관람 (15분 소요)",
         "2순위: 해안 산책로 사진 촬영 포인트 방문",
         "3순위: 인근 카페에서 휴식 (도보 3분 거리)"
-      ]
+      ],
+      photo: null,
+      photoUpload: { enabled: false } // true로 바꾸면 참가자가 이 활동 사진을 직접 업로드할 수 있는 칸이 생깁니다 (사진 업로드 기능 최초 설정 필요, README 참고)
     },
     {
       id: 4,
@@ -142,7 +166,9 @@ window.CONTENT = {
         allergyNote: "돼지고기, 새우젓(갑각류), 밀가루(부침류)가 포함되어 있습니다. 알레르기가 있으신 분은 사전에 담당자에게 꼭 알려주세요.",
         vegetarianOption: "채식 옵션 있음 (사전 신청자에 한해 나물 정식으로 대체 제공)"
       },
-      freeTimeRecommendation: null
+      freeTimeRecommendation: null,
+      photo: null,
+      photoUpload: { enabled: false } // true로 바꾸면 참가자가 이 활동 사진을 직접 업로드할 수 있는 칸이 생깁니다 (사진 업로드 기능 최초 설정 필요, README 참고)
     },
     {
       id: 5,
@@ -156,7 +182,9 @@ window.CONTENT = {
       difficulty: null,
       distance: null,
       meal: null,
-      freeTimeRecommendation: null
+      freeTimeRecommendation: null,
+      photo: null,
+      photoUpload: { enabled: false } // true로 바꾸면 참가자가 이 활동 사진을 직접 업로드할 수 있는 칸이 생깁니다 (사진 업로드 기능 최초 설정 필요, README 참고)
     }
   ],
 

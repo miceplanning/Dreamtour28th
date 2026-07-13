@@ -11,6 +11,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const c = window.CONTENT;
   const root = document.getElementById("home-content");
 
+  // 이번 회차에 해당 섹션을 쓰는지 확인 (sectionsEnabled에 값이 없으면 기본적으로 사용함)
+  function sectionOn(key) {
+    return !(c.sectionsEnabled && c.sectionsEnabled[key] === false);
+  }
+
   // ---------------- 히어로 영역 ----------------
   const heroHtml =
     '<div class="hero">' +
@@ -23,17 +28,20 @@ document.addEventListener("DOMContentLoaded", function () {
     "</div>";
 
   // ---------------- 빠른 메뉴 ----------------
+  const quickMenuItems = [
+    '<a href="schedule.html"><span class="icon">🗓️</span>일정</a>',
+    '<a href="location.html"><span class="icon">🗺️</span>오시는길</a>',
+    sectionOn("faq") ? '<a href="faq.html"><span class="icon">❓</span>FAQ</a>' : "",
+    sectionOn("survey") ? '<a href="survey.html"><span class="icon">📝</span>설문조사</a>' : ""
+  ].filter(Boolean);
   const quickMenuHtml =
-    '<div class="quick-menu">' +
-    '<a href="schedule.html"><span class="icon">🗓️</span>일정</a>' +
-    '<a href="location.html"><span class="icon">🗺️</span>오시는길</a>' +
-    '<a href="faq.html"><span class="icon">❓</span>FAQ</a>' +
-    '<a href="survey.html"><span class="icon">📝</span>설문조사</a>' +
+    '<div class="quick-menu" style="grid-template-columns: repeat(' + quickMenuItems.length + ', 1fr);">' +
+    quickMenuItems.join("") +
     "</div>";
 
   // ---------------- 집결 정보 요약 카드 ----------------
   let meetingHtml = "";
-  if (c.meetingSummary) {
+  if (c.meetingSummary && sectionOn("meetingSummary")) {
     meetingHtml =
       '<div class="card">' +
       '<div class="section-title">📍 집결 정보</div>' +
@@ -74,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ---------------- 우천 시 안내 ----------------
   let rainHtml = "";
-  if (c.rainPlan) {
+  if (c.rainPlan && sectionOn("rainPlan")) {
     rainHtml =
       '<div class="rain-card ' + (c.rainPlan.hasIndoorAlternative ? "" : "inactive") + '">' +
       '<div class="rain-title">☔ 우천 시 안내</div>' +
@@ -87,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ---------------- 준비물 체크리스트 (UI용, 저장되지 않음) ----------------
   let checklistHtml = "";
-  if (c.checklist && c.checklist.length) {
+  if (c.checklist && c.checklist.length && sectionOn("checklist")) {
     checklistHtml =
       '<div class="card">' +
       '<div class="section-title">🎒 준비물 체크리스트</div>' +
@@ -108,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ---------------- 현장 스태프 ----------------
   let staffHtml = "";
-  if (c.staff && c.staff.length) {
+  if (c.staff && c.staff.length && sectionOn("staff")) {
     staffHtml =
       '<div class="card">' +
       '<div class="section-title">🙋 현장 스태프</div>' +
@@ -130,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ---------------- 설문조사 유도 ----------------
   let surveyHtml = "";
-  if (c.survey) {
+  if (c.survey && sectionOn("survey")) {
     surveyHtml =
       '<div class="card" style="text-align:center;">' +
       '<div class="section-title" style="justify-content:center;">📝 설문조사에 참여해주세요</div>' +

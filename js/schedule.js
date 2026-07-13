@@ -41,6 +41,18 @@ function scheduleItemHtml(item, index) {
     ? '<div class="travel-next">🚌 다음 장소까지: ' + escapeHtml(item.travelTimeToNext) + "</div>"
     : "";
 
+  const photoHtml = item.photo
+    ? '<img class="schedule-photo" src="' + escapeHtml(item.photo) + '" alt="' + escapeHtml(item.title) + '" onerror="this.remove()" />'
+    : "";
+
+  // 참가자 사진 업로드 칸은 상호작용(파일 선택, 비동기 업로드)이 필요해서
+  // 문자열이 아니라 실제 DOM으로 나중에 채워 넣습니다 (아래 buildUploadWidget 참고).
+  // 여기서는 자리표시자(빈 칸)만 만들어둡니다.
+  const uploadSlotHtml =
+    item.photoUpload && item.photoUpload.enabled
+      ? '<div class="upload-widget-slot" data-schedule-id="' + item.id + '"></div>'
+      : "";
+
   return (
     '<div class="timeline-item" id="schedule-item-' + item.id + '">' +
     '<div class="timeline-card">' +
@@ -55,16 +67,84 @@ function scheduleItemHtml(item, index) {
     '<span class="chevron">▾</span>' +
     "</button>" +
     '<div class="timeline-body"><div class="timeline-body-inner">' +
+    photoHtml +
     (item.description ? '<div class="desc">' + escapeHtml(item.description) + "</div>" : "") +
     (chips.length ? '<div class="info-row">' + chips.join("") + "</div>" : "") +
     mapButtonHtml(item.mapUrl, "이 장소 지도 보기") +
     mealHtml +
     recommendHtml +
     travelHtml +
+    uploadSlotHtml +
     "</div></div>" +
     "</div>" +
     "</div>"
   );
+}
+
+// ---------------------------------------------------------------
+// 참가자 사진 업로드 칸 (photoUpload.enabled 인 일정에만 표시됩니다)
+// ---------------------------------------------------------------
+function buildUploadWidget(item, eventDate) {
+  const wrap = document.createElement("div");
+  wrap.className = "upload-widget";
+
+  if (typeof isUploadConfigured !== "function" || !isUploadConfigured()) {
+    wrap.innerHTML = '<div class="upload-disabled-note">📸 사진 업로드 기능이 아직 준비 중입니다. 잠시 후 다시 확인해주세요.</div>';
+    return wrap;
+  }
+
+  wrap.innerHTML =
+    '<div class="upload-title">📸 이 활동 사진을 올려주세요!</div>' +
+    '<input type="text" class="upload-name" placeholder="이름 또는 팀명 (선택)" />' +
+    '<div class="upload-row">' +
+    '<input type="file" accept="image/*" capture="environment" class="upload-file" hidden />' +
+    '<button type="button" class="upload-pick-btn">사진 선택해서 올리기</button>' +
+    "</div>" +
+    '<div class="upload-status"></div>' +
+    '<div class="upload-gallery"></div>';
+
+  const fileInput = wrap.querySelector(".upload-file");
+  const pickBtn = wrap.querySelector(".upload-pick-btn");
+  const status = wrap.querySelector(".upload-status");
+  const nameInput = wrap.querySelector(".upload-name");
+  const gallery = wrap.querySelector(".upload-gallery");
+
+  async function loadGallery() {
+    gallery.innerHTML = '<div class="upload-gallery-empty">사진을 불러오는 중...</div>';
+    try {
+      const photos = await listSchedulePhotos(eventDate, item.id);
+      if (!photos.length) {
+        gallery.innerHTML = '<div class="upload-gallery-empty">아직 업로드된 사진이 없어요. 첫 번째로 올려보세요!</div>';
+        return;
+      }
+      gallery.innerHTML = photos.map((p) => '<img src="' + p.url + '" alt="참가자가 올린 사진" loading="lazy" />').join("");
+    } catch (e) {
+      gallery.innerHTML = "";
+    }
+  }
+
+  pickBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    pickBtn.disabled = true;
+    status.textContent = "업로드 중... 0%";
+    try {
+      await uploadSchedulePhoto(eventDate, item.id, file, nameInput.value.trim(), (pct) => {
+        status.textContent = "업로드 중... " + pct + "%";
+      });
+      status.textContent = "✅ 업로드 완료! 감사합니다.";
+      fileInput.value = "";
+      loadGallery();
+    } catch (e) {
+      status.textContent = "⚠️ 업로드에 실패했어요. 다시 시도해주세요.";
+    } finally {
+      pickBtn.disabled = false;
+    }
+  });
+
+  loadGallery();
+  return wrap;
 }
 
 // 현재 시각 기준으로 "다음 일정" 을 계산합니다 (당일 참가자가 스크롤하면서 확인하기 쉽도록)
@@ -88,6 +168,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   root.innerHTML = '<div class="timeline">' + c.schedule.map(scheduleItemHtml).join("") + "</div>";
+
+  // 사진 업로드가 켜진 일정마다, 자리표시자에 실제 업로드 위젯을 채워 넣습니다.
+  c.schedule
+    .filter((item) => item.photoUpload && item.photoUpload.enabled)
+    .forEach((item) => {
+      const slot = root.querySelector('.upload-widget-slot[data-schedule-id="' + item.id + '"]');
+      if (slot) slot.replaceWith(buildUploadWidget(item, c.date));
+    });
 
   // --- "다음 일정" 스티키 바 세팅 ---
   const bar = document.getElementById("next-schedule-bar");

@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const c = window.CONTENT;
   const root = document.getElementById("survey-content");
 
+  if (c.sectionsEnabled && c.sectionsEnabled.survey === false) {
+    root.innerHTML = '<p style="color:var(--color-muted); padding:20px;">이번 회차는 설문조사가 준비되어 있지 않습니다.</p>';
+    return;
+  }
+
   if (!c.survey) {
     root.innerHTML = '<p style="color:var(--color-muted); padding:20px;">등록된 설문조사가 없습니다.</p>';
     return;

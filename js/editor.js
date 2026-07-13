@@ -27,6 +27,10 @@ function withDefaults(src) {
     dateDisplay: src.dateDisplay || "",
     heroImage: src.heroImage || "",
     heroTagline: src.heroTagline || "",
+    sectionsEnabled: Object.assign(
+      { rainPlan: true, staff: true, meetingSummary: true, checklist: true, faq: true, survey: true },
+      src.sectionsEnabled || {}
+    ),
     notice: Object.assign({ active: false, text: "" }, src.notice || {}),
     rainPlan: Object.assign(
       { hasIndoorAlternative: false, description: "", decisionTime: "" },
@@ -244,7 +248,7 @@ function attachPhotoPicker(pathInput, opts) {
   const pickBtn = document.createElement("button");
   pickBtn.type = "button";
   pickBtn.className = "photo-pick-btn";
-  pickBtn.textContent = "🖼️ 컴퓨터에서 사진 선택";
+  pickBtn.textContent = "🖼️ 사진 선택";
   pickBtn.addEventListener("click", () => fileInput.click());
 
   const thumb = document.createElement("img");
@@ -315,6 +319,54 @@ function renderStaffList() {
   setCount("count-staff", state.staff.length);
 }
 
+// 특정 일정 항목에 참가자가 올린 사진들을 운영팀이 확인할 수 있는 뷰어(조회 전용)를 그립니다.
+function renderUploadViewer(container, item, state) {
+  container.innerHTML = "";
+  if (!item.photoUpload || !item.photoUpload.enabled) return;
+
+  if (typeof isUploadConfigured !== "function" || !isUploadConfigured()) {
+    container.innerHTML =
+      '<div class="upload-viewer-note">⚠️ 사진 업로드 기능이 아직 설정되지 않았어요. README.md의 "참가자 사진 업로드 기능 설정하기"를 따라 js/firebase-config.js를 채워주세요.</div>';
+    return;
+  }
+
+  const refreshBtn = document.createElement("button");
+  refreshBtn.type = "button";
+  refreshBtn.className = "upload-viewer-refresh";
+  refreshBtn.textContent = "🔄 업로드된 사진 확인";
+
+  const grid = document.createElement("div");
+  grid.className = "upload-viewer-grid";
+
+  refreshBtn.addEventListener("click", async () => {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = "불러오는 중...";
+    grid.innerHTML = "";
+    try {
+      const photos = await listSchedulePhotos(state.date, item.id);
+      if (!photos.length) {
+        grid.innerHTML = '<div class="upload-viewer-empty">아직 업로드된 사진이 없습니다.</div>';
+      } else {
+        grid.innerHTML = photos
+          .map(
+            (p) =>
+              '<a href="' + p.url + '" target="_blank" rel="noopener noreferrer">' +
+              '<img src="' + p.url + '" alt="업로드된 사진" loading="lazy" /></a>'
+          )
+          .join("");
+      }
+    } catch (e) {
+      grid.innerHTML = '<div class="upload-viewer-empty">불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>';
+    } finally {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = "🔄 업로드된 사진 확인";
+    }
+  });
+
+  container.appendChild(refreshBtn);
+  container.appendChild(grid);
+}
+
 // ---------------------------------------------------------------
 // ⑦ 시간별 일정
 // ---------------------------------------------------------------
@@ -327,6 +379,7 @@ function renderScheduleList() {
       item, state.schedule, renderScheduleList
     );
 
+    const photoLabel = fieldInput("관련 사진 경로 (선택)", item, "photo", { span2: true, placeholder: "images/schedule-1.jpg" });
     body.appendChild(fieldGrid(
       fieldInput("시작 시각", item, "time", { placeholder: "13:00" }),
       fieldInput("종료 시각 (선택)", item, "endTime", { placeholder: "13:20" }),
@@ -334,6 +387,7 @@ function renderScheduleList() {
       fieldInput("장소명", item, "location", { span2: true }),
       fieldInput("구글맵 링크", item, "mapUrl", { span2: true, placeholder: "https://maps.google.com/?q=..." }),
       fieldInput("상세 설명 (펼쳤을 때 보이는 내용)", item, "description", { textarea: true, rows: 2, span2: true }),
+      photoLabel,
       fieldInput("다음 장소까지 이동시간 (선택)", item, "travelTimeToNext", { placeholder: "버스 이동 약 15분" }),
       fieldSelect("난이도 (도보 프로그램만)", item, "difficulty", [
         { value: "", label: "해당 없음" },
@@ -343,6 +397,7 @@ function renderScheduleList() {
       ]),
       fieldInput("총 도보 거리 (선택)", item, "distance", { placeholder: "총 도보 2.3km" })
     ));
+    attachPhotoPicker(photoLabel.querySelector("input"), { prefix: "schedule-" + (idx + 1) + "-" });
 
     // 식사 정보 (알레르기/채식) 토글 블록
     const mealToggle = document.createElement("label");
@@ -376,6 +431,30 @@ function renderScheduleList() {
     body.appendChild(mealBlock);
 
     body.appendChild(fieldTextareaList("자유시간 추천 동선 (한 줄에 하나씩, 없으면 빈칸)", item, "freeTimeRecommendation"));
+
+    // 참가자 사진 업로드 받기 토글 + (켜져 있으면) 업로드된 사진 확인 뷰어
+    if (!item.photoUpload) item.photoUpload = { enabled: false };
+    const uploadToggle = document.createElement("label");
+    uploadToggle.className = "checkbox-line";
+    const uploadCheckbox = document.createElement("input");
+    uploadCheckbox.type = "checkbox";
+    uploadCheckbox.checked = !!item.photoUpload.enabled;
+    uploadToggle.appendChild(uploadCheckbox);
+    uploadToggle.appendChild(document.createTextNode("📸 참가자에게 이 활동 사진 업로드 받기"));
+    body.appendChild(uploadToggle);
+
+    const uploadViewer = document.createElement("div");
+    uploadViewer.className = "upload-viewer";
+    uploadViewer.hidden = !item.photoUpload.enabled;
+    body.appendChild(uploadViewer);
+    renderUploadViewer(uploadViewer, item, state);
+
+    uploadCheckbox.addEventListener("change", () => {
+      item.photoUpload.enabled = uploadCheckbox.checked;
+      uploadViewer.hidden = !item.photoUpload.enabled;
+      renderUploadViewer(uploadViewer, item, state);
+      markDirty();
+    });
 
     container.appendChild(row);
   });
@@ -453,6 +532,14 @@ function buildExportObject() {
     eventSubtitle: state.eventSubtitle,
     date: state.date,
     dateDisplay: state.dateDisplay,
+    sectionsEnabled: {
+      rainPlan: !!state.sectionsEnabled.rainPlan,
+      staff: !!state.sectionsEnabled.staff,
+      meetingSummary: !!state.sectionsEnabled.meetingSummary,
+      checklist: !!state.sectionsEnabled.checklist,
+      faq: !!state.sectionsEnabled.faq,
+      survey: !!state.sectionsEnabled.survey
+    },
     heroImage: state.heroImage,
     heroTagline: state.heroTagline,
     notice: { active: !!state.notice.active, text: state.notice.text },
@@ -486,7 +573,9 @@ function buildExportObject() {
             vegetarianOption: it.meal.vegetarianOption || ""
           }
         : null,
-      freeTimeRecommendation: it.freeTimeRecommendation && it.freeTimeRecommendation.length ? it.freeTimeRecommendation : null
+      freeTimeRecommendation: it.freeTimeRecommendation && it.freeTimeRecommendation.length ? it.freeTimeRecommendation : null,
+      photo: it.photo || null,
+      photoUpload: { enabled: !!(it.photoUpload && it.photoUpload.enabled) }
     })),
     locations: state.locations.map((loc, idx) => ({
       order: idx + 1,
@@ -548,6 +637,56 @@ function doDownload() {
       floatBtn.classList.remove("saved");
     }, 1500);
   }
+}
+
+// ---------------------------------------------------------------
+// 섹션 사용/사용안함 토글 ("이 섹션 사용" 체크박스가 있는 패널들)
+// 데이터는 지우지 않고 sectionsEnabled 플래그만 꺼서, 참가자 사이트에서만
+// 안 보이게 합니다 — 다음 회차에 다시 켜면 그대로 돌아옵니다.
+// ---------------------------------------------------------------
+function updateSectionToggleVisual(checkbox) {
+  const key = checkbox.dataset.sectionKey;
+  const enabled = checkbox.checked;
+  const toggleWrap = checkbox.closest(".section-toggle");
+  if (toggleWrap) toggleWrap.classList.toggle("is-off", !enabled);
+
+  const panel = checkbox.closest(".editor-panel");
+  if (!panel) return;
+  const navBtn = document.querySelector('#editor-nav button[data-target="' + panel.id + '"]');
+  if (!navBtn) return;
+  navBtn.classList.toggle("section-off", !enabled);
+  let badge = navBtn.querySelector(".off-badge");
+  if (!enabled) {
+    if (!badge) {
+      badge = document.createElement("span");
+      badge.className = "off-badge";
+      badge.textContent = "꺼짐";
+      navBtn.appendChild(badge);
+    }
+  } else if (badge) {
+    badge.remove();
+  }
+}
+
+function initSectionToggles() {
+  document.querySelectorAll("input[data-section-key]").forEach((checkbox) => {
+    const key = checkbox.dataset.sectionKey;
+
+    const note = document.createElement("div");
+    note.className = "off-note";
+    note.textContent = "⚠️ 지금 이 섹션은 꺼져 있어서 참가자 사이트에는 보이지 않습니다.";
+    const toggleWrap = checkbox.closest(".section-toggle");
+    if (toggleWrap) toggleWrap.appendChild(note);
+
+    checkbox.checked = state.sectionsEnabled[key] !== false;
+    updateSectionToggleVisual(checkbox);
+
+    checkbox.addEventListener("change", () => {
+      state.sectionsEnabled[key] = checkbox.checked;
+      updateSectionToggleVisual(checkbox);
+      markDirty();
+    });
+  });
 }
 
 // ---------------------------------------------------------------
@@ -657,7 +796,7 @@ document.addEventListener("DOMContentLoaded", function () {
     state.schedule.push({
       id: 0, time: "", endTime: "", title: "", location: "", mapUrl: "",
       description: "", travelTimeToNext: "", difficulty: "", distance: "",
-      meal: null, freeTimeRecommendation: []
+      meal: null, freeTimeRecommendation: [], photo: "", photoUpload: { enabled: false }
     });
     renderScheduleList();
     markDirty();
@@ -711,6 +850,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   initWizardNav();
+  initSectionToggles();
   syncHeaderHeight();
   window.addEventListener("resize", syncHeaderHeight);
 });
