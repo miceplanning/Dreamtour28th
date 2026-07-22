@@ -90,12 +90,35 @@ window.CONTENT = {
       "id": 2,
       "date": "2026-07-30",
       "time": "14:20",
-      "endTime": "16:00",
-      "title": "잔디광장에서 진행하는 조별 레크레이션",
+      "endTime": "15:30",
+      "title": "🍊 팀별 미션: 제주 30초 릴스 챌린지",
       "location": "함덕해수욕장 잔디광장",
       "mapUrl": "https://maps.app.goo.gl/hFWAgnnEghWwNSpE9",
-      "description": "팀별 레크레이션 게임을 진행할 예정입니다. 야외에서 진행할 예정이며, 날이 더울 것으로 예상됩니다. 꼭 손성풍기, 양산, 모자,선글라스 준비해주세요!  또한 편한 신발을 착용해주세요. 시원한 음료가 준비되어 있습니다.",
+      "description": "팀별로 \"제주\"를 주제로 한 30초 릴스를 제작해 주세요. 표현 방식은 팀의 자유입니다. 정답은 없습니다 — 우리 팀만의 색깔을 보여주세요! 기본 규칙 — 주제(키워드): 제주(장소, 음식, 방언, 자연, 사람 등 무엇이든 OK) / 영상 길이: 30초 내외 / 형식: 세로형(9:16), 인스타그램 릴스·틱톡 업로드 규격 / 촬영 장소·소품·음악: 자유 / 팀원 전원 1회 이상 등장 필수. 야외에서 진행하며 날이 더울 것으로 예상되니 손선풍기, 양산, 모자, 선글라스 꼭 준비해주세요! 편한 신발을 착용해주시고, 시원한 음료가 준비되어 있습니다. 영상은 조별 대표 1명이 아래 '사진업로드' 메뉴에서 올려주세요!",
       "travelTimeToNext": "도보 이동 약 5분",
+      "difficulty": null,
+      "distance": null,
+      "meal": null,
+      "freeTimeRecommendation": null,
+      "photo": null,
+      "voteUrl": "https://docs.google.com/forms/d/e/1FAIpQLSej0_O0P1zQwp_O7lgekTvM88iVduU2Jl71fz5E-eHcL6wcPw/viewform?usp=publish-editor",
+      "photoUpload": {
+        "enabled": true,
+        "formUrl": "https://forms.gle/91fueoqtoXX9QbgR9",
+        "driveFolderUrl": "",
+        "description": "제주 30초 릴스 챌린지 영상은 조별 대표 1명만 올려주세요!"
+      }
+    },
+    {
+      "id": 3,
+      "date": "2026-07-30",
+      "time": "15:30",
+      "endTime": "16:00",
+      "title": "자유시간",
+      "location": "함덕해수욕장 잔디광장",
+      "mapUrl": "https://maps.app.goo.gl/hFWAgnnEghWwNSpE9",
+      "description": "릴스 촬영 마무리 및 자유 시간입니다. 편하게 쉬시거나 해수욕 준비를 해주세요.",
+      "travelTimeToNext": null,
       "difficulty": null,
       "distance": null,
       "meal": null,
@@ -109,7 +132,7 @@ window.CONTENT = {
       }
     },
     {
-      "id": 3,
+      "id": 4,
       "date": "2026-07-30",
       "time": "16:00",
       "endTime": "17:30",
@@ -131,7 +154,7 @@ window.CONTENT = {
       }
     },
     {
-      "id": 4,
+      "id": 5,
       "date": "2026-07-30",
       "time": "17:40",
       "endTime": "18:40",
@@ -153,7 +176,7 @@ window.CONTENT = {
       }
     },
     {
-      "id": 5,
+      "id": 6,
       "date": "2026-07-30",
       "time": "18:40",
       "endTime": "19:10",

@@ -53,6 +53,10 @@ function scheduleItemHtml(item, index) {
       ? '<a class="upload-prompt" href="upload.html">📸 이 활동 사진은 <b>사진업로드</b> 메뉴에서 올릴 수 있어요 →</a>'
       : "";
 
+  const voteHtml = item.voteUrl
+    ? '<a class="btn btn-map" href="' + escapeHtml(item.voteUrl) + '" target="_blank" rel="noopener noreferrer">🗳️ 투표하러 가기</a>'
+    : "";
+
   return (
     '<div class="timeline-item" id="schedule-item-' + item.id + '">' +
     '<div class="timeline-card">' +
@@ -71,6 +75,7 @@ function scheduleItemHtml(item, index) {
     (item.description ? '<div class="desc">' + escapeHtml(item.description) + "</div>" : "") +
     (chips.length ? '<div class="info-row">' + chips.join("") + "</div>" : "") +
     mapButtonHtml(item.mapUrl, "이 장소 지도 보기") +
+    voteHtml +
     mealHtml +
     recommendHtml +
     travelHtml +
